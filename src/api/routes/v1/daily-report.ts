@@ -36,7 +36,9 @@ const cache: Cache = {
 }
 
 /**
- * Formats database query.
+ * Formats database results to suit the needs of the daily_agreement scores.
+ *
+ * Note: `incomplete: True` refers to the fact that the current time is not past 23:00:00 local time. Hence, the daily_agreement score could change in the later hours of the day.
  *
  * @param response - Response from the database query.
  * @returns Formatted daily score.
@@ -64,9 +66,9 @@ function formatResponse(response: DatabaseResponse): DailyScoreResponse {
 }
 
 /**
- * Reads nodes from database.
+ * Reads daily_agreement scores from database.
  *
- * @returns Locations of nodes crawled in the last day.
+ * @returns Specified columns for the current day.
  */
 async function getReports(): Promise<DailyScoreResponse[]> {
   const day = new Date()
@@ -90,7 +92,7 @@ async function getReports(): Promise<DailyScoreResponse[]> {
 }
 
 /**
- * Updates cached Nodes.
+ * Updates cached daily_agreement scores. If the cache is older than CACHE_INTERVAL_MILLIS (1 minute) or if the cache is empty, the cache is updated.
  *
  * @returns Void.
  */
@@ -104,8 +106,6 @@ async function cacheScores(): Promise<void> {
   }
 }
 
-void cacheScores()
-
 /**
  * Handles Nodes request.
  *
@@ -117,7 +117,10 @@ export default async function handleDailyScores(
   res: Response,
 ): Promise<void> {
   try {
-    if (Date.now() - cache.time > CACHE_INTERVAL_MILLIS) {
+    if (
+      Date.now() - cache.time > CACHE_INTERVAL_MILLIS ||
+      cache.scores.length === 0
+    ) {
       await cacheScores()
     }
 

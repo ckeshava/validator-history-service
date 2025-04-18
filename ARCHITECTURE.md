@@ -59,11 +59,11 @@ This table keeps track of the nodes in the network, which it finds via crawling 
 
 This table keeps track of how reliable validators have been, on a 24-hour level.
 
-| Key                  | Definition                            |
-|----------------------|---------------------------------------|
-| `master_key`         |The master key of the node.            |
-| `day`                |The day that the data is for.          |
-| `agreement`          |Data about the reliability of the node.|
+| Key                  | Definition                               |
+|----------------------|------------------------------------------|
+| `main_key`           |The master key of the node.(primary key)  |
+| `day`                |The day that the data is for.(primary key)|
+| `agreement`          |Data about the reliability of the node.   |
 
 
 ### `hourly_agreement`
@@ -148,20 +148,6 @@ This table keeps track of the most current voting data for the validators.
 | `amendments`         |The amendments this validator wants to be added to the protocol.     |
 | `base_fee`           |The unscaled transaction cost this validator wants to set.           |
 | `reserve_base`       |The minimum reserve requirement this validator wants to set.         |
-| `reserve_inc`        |The increment in the reserve requirement this validator wants to set.|
-
-
-### `ballot`
-
-This table keeps track of the most current voting data for the validators.
-
-| Key                  | Definition                                                        |
-|----------------------|-------------------------------------------------------------------|
-| `signing_key`        |The signing key of the validator.                                  |
-| `ledger_index`       |The most recent ledger index where voting data was retrieved.      |
-| `amendments`         |The amendments this validator wants to be added to the protocol.   |
-| `base_fee`           |The unscaled transaction cost this validator wants to set.         |
-| `reserve_base`       |The minimum reserve requirement this validator wants to set.       |
 | `reserve_inc`        |The increment in the reserve requirement this validator wants to set.|
 
 

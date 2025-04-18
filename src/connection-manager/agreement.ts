@@ -68,7 +68,8 @@ function setDifference<T>(set1: Iterable<T>, set2: Map<T, unknown>): Set<T> {
 }
 
 /**
- * Updates 1 hour, 1 day, and 30 day agreement scores.
+ * Updates 1 day, and 30 day agreement scores in the `validators` table.
+ * Note: The agreement scores are computed for the 24H, 30D period ending at the current time. The scores *do not* correspond to the beginning of the day (or) the month respectively.
  *
  * @param validator_keys - Master Key and Signing Key of the validator.
  * @returns Void.
@@ -90,7 +91,8 @@ async function updateAgreementScores(
 }
 
 /**
- * Updates agreement for a validator.
+ * Updates agreement for a validator into the `daily_agreement` table.
+ * The agreement is computed for the 24H period between 0000 to 2359 hours local time of the current date.
  *
  * @param validator_keys - Signing_keys of validator to update agreement for.
  * @returns Void.
@@ -285,6 +287,7 @@ class Agreement {
 
   /**
    * Calculate the agreement score for the last hour of validations.
+   * This method is responsible for saving the agreement score into the `hourly_agreement` table and the `agreement_1hour` column into the `validators` table.
    *
    * @param validator_keys - Signing keys of validations for one validator.
    * @param validations - Set of ledger_hashes validated by signing_key.

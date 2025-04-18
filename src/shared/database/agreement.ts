@@ -64,7 +64,7 @@ export async function getAgreementScores(
  * Maps a signing key to a master key.
  *
  * @param signing_key - Signing key to look up.
- * @returns String or undefined if not found.
+ * @returns master key corresponding to the input signing key (or) undefined if signing key is not found.
  */
 export async function signingToMaster(
   signing_key: string,
@@ -101,7 +101,7 @@ async function getHourlyAgreementScores(
 }
 
 /**
- * Calculates an agreement score from a list of AgreementScores.
+ * Calculates a cumulative agreement score from a list of AgreementScores.
  *
  * @param scores - List of AgreementScores.
  * @returns Agreement Score for all scores.
