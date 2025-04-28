@@ -23,7 +23,10 @@ export async function saveHourlyAgreement(
     .insert(agreement)
     .onConflict(['main_key', 'start'])
     .merge()
-    .catch((err: Error) => log.error('Error saving Hourly Agreement', err))
+    .catch((err: Error) => {
+      log.error('Error saving Hourly Agreement', err)
+      throw err
+    })
 }
 
 /**
@@ -39,7 +42,10 @@ export async function saveDailyAgreement(
     .insert(agreement)
     .onConflict(['main_key', 'day'])
     .merge()
-    .catch((err) => log.error('Error saving Daily Agreement', err))
+    .catch((err: Error) => {
+      log.error('Error saving Daily Agreement', err)
+      throw err
+    })
 }
 
 /**
