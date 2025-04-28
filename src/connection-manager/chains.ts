@@ -75,7 +75,7 @@ class Chains {
   private index = 0
 
   /**
-   * Updates chains as validations come in.
+   * Upon receiving a validation, this method updates the ledger_hash to Ledger (`this.ledgersByHash`) map.
    *
    * @param validation - A raw validation message.
    */

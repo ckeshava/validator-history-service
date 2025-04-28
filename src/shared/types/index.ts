@@ -13,6 +13,7 @@ interface Chain {
 interface Ledger {
   ledger_hash: string
   ledger_index: number
+  // this variable collects all the validations recieved for a given ledger
   validations: Set<string>
   first_seen: number
 }
