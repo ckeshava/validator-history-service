@@ -50,7 +50,19 @@ function formatResponse(response: DatabaseResponse): DailyScoreResponse {
     chain,
     agreement: { validated, missed },
   } = response
-  const score: number = validated / (validated + missed)
+
+  let score: number
+
+  try {
+    score = validated / (validated + missed)
+  } catch (err: unknown) {
+    log.error('Error computing the agreement score', err)
+    log.error(
+      'Database Response which caused the error: ',
+      JSON.stringify(response),
+    )
+    throw err
+  }
   const time = new Date()
   time.setHours(23, 0, 0, 0)
 
