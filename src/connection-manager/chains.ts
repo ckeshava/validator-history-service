@@ -147,7 +147,7 @@ class Chains {
   }
 
   /**
-   * Returns the next chain id.
+   * Returns the next chain id. The chain_id values round back to 0 after 10000.
    *
    * @returns The chain id.
    */

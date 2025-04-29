@@ -189,7 +189,7 @@ export async function getLists(): Promise<Record<string, Set<string>>> {
  *
  * @param set1 - Set of signing keys of validators in the first chain.
  * @param set2 - Set of signing keys of validators in the second chain.
- * @returns A boolean indicating whether there is overlap.
+ * @returns A boolean indicating if an element of set1 is present in set2.
  */
 export function overlaps(
   set1: Set<string | undefined>,
