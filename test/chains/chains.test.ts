@@ -15,8 +15,13 @@ describe('Creates chains', () => {
     await destroy()
   })
 
+  // Note: The `chains` module does not update the `crawls` table.
   beforeEach(async () => {
-    await query('crawls').delete('*')
+    expect(await query('crawls').select('*')).toEqual([])
+  })
+
+  afterEach(async () => {
+    expect(await query('crawls').select('*')).toEqual([])
   })
 
   test('Perfect validation scores', async () => {
