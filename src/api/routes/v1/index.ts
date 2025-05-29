@@ -32,8 +32,11 @@ api.use('/network/topology/nodes', handleNodes)
 api.use('/network/topology/node/:publicKey', handleNode)
 api.use('/network/topology', handleTopology)
 
+// The below API endpoints expects the master public key of the validator to be in the URL path.
 api.use('/network/validator/:publicKey/reports', handleValidatorReport)
+// The below API endpoints expects the master public key of the validator to be in the URL path.
 api.use('/network/validator/:publicKey/manifests', handleValidatorManifest)
+// The below API endpoints expects the validation public key of the validator to be in the URL path.
 api.use('/network/validator/:publicKey', handleValidator)
 api.use('/network/validators/:param', handleValidators)
 api.use('/network/validators', handleValidators)
