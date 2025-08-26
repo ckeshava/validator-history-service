@@ -31,6 +31,9 @@ function addLedgerToChain(ledger: Ledger, chain: Chain): void {
 
   chain.current = ledger.ledger_index
   chain.updated = ledger.first_seen
+  log.info(
+    `addLedgerToChain: (Ledger Index: ${ledger.ledger_index}, Ledger Hash: ${ledger.ledger_hash}) added to chain ${chain.id}`,
+  )
 }
 
 /**
@@ -113,7 +116,16 @@ class Chains {
         list.push(ledger)
       }
 
+      if (ledger.validations.size <= 1) {
+        log.warn(
+          `chains: Ledger ${ledger.ledger_index}, ledger_hash: ${ledger_hash} has only one validation; This is ignored for purposes of agreement calculation`,
+        )
+      }
+
       if (tenSecondsOld) {
+        log.info(
+          `chains: Ledger ${ledger.ledger_index}, ledger_hash: ${ledger_hash} is >= 10 seconds old; Removing this from in-memory this.ledgersByHash cache.`,
+        )
         this.ledgersByHash.delete(ledger_hash)
       }
     }
@@ -138,6 +150,7 @@ class Chains {
     })
 
     for (const chain of this.chains) {
+      log.info(`purgeChains: purging all data from chain: ${chain.id}`)
       chain.ledgers.clear()
       chain.incomplete = false
       promises.push(saveValidatorChains(chain))
@@ -182,6 +195,13 @@ class Chains {
     }
 
     log.info(`Added new chain, chain.${chain.id}`)
+    log.info(
+      `Initializing new chain with the ledger: ${JSON.stringify(
+        ledger,
+        null,
+        2,
+      )}`,
+    )
     this.chains.push(chain)
   }
 
@@ -190,9 +210,14 @@ class Chains {
    *
    * @param ledger - The Ledger being handled in order to update the chains.
    */
+  // eslint-disable-next-line max-lines-per-function, max-statements -- required for debugging
   private updateChains(ledger: Ledger): void {
     const next = ledger.ledger_index
     const validators = ledger.validations
+
+    log.info(
+      `updateChains invoked for ledger: ${ledger.ledger_index} (Ledger Hash: ${ledger.ledger_hash})`,
+    )
 
     const chainAtNextIndex: Chain | undefined = this.chains
       .filter(
@@ -216,6 +241,9 @@ class Chains {
       .shift()
 
     if (chainAtThisIndex !== undefined) {
+      log.info(
+        `updateChains: ${ledger.ledger_index} is already processed inside chain ${chainAtThisIndex.id}`,
+      )
       return
     }
 
@@ -223,9 +251,21 @@ class Chains {
       .filter((chain) => overlaps(chain.validators, validators))
       .shift()
 
+    if (chainWithThisValidator !== undefined) {
+      log.info(
+        `updateChains: Found an existing chain ${chainWithThisValidator.id} with an overlapping validator set`,
+      )
+    }
+
     const chainWithLedger: Chain | undefined = this.chains.find(
       (chain: Chain) => chain.ledgers.has(ledger.ledger_hash),
     )
+
+    if (chainWithLedger !== undefined) {
+      log.info(
+        `updateChains: Found an existing chain ${chainWithLedger.id} with the ledger index ${ledger.ledger_index} and ledger hash ${ledger.ledger_hash}`,
+      )
+    }
 
     if (chainWithThisValidator !== undefined) {
       const skipped = ledger.ledger_index - chainWithThisValidator.current
@@ -233,10 +273,17 @@ class Chains {
       if (skipped > 1 && skipped < 20) {
         chainWithThisValidator.incomplete = true
         addLedgerToChain(ledger, chainWithThisValidator)
+      } else {
+        log.warn(
+          `updateChains: ${ledger.ledger_index} is not added to any chain.`,
+        )
       }
     }
 
     if (chainWithThisValidator !== undefined || chainWithLedger !== undefined) {
+      log.warn(
+        `updateChains: ${ledger.ledger_index} is not added to any chain.`,
+      )
       return
     }
 

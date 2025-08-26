@@ -298,6 +298,22 @@ class Agreement {
     ledgers: Set<string>,
     incomplete: boolean,
   ): Promise<void> {
+    log.info(
+      `calculateHourlyAgreement: initiating agreement computation at timestamp: ${new Date().toISOString()}`,
+    )
+    log.info(
+      `calculateHourlyAgreement: validator_keys: ${validator_keys.signing_key}`,
+    )
+    log.info(`calculateHourlyAgreement: validation counts: `)
+    validations.forEach((value, key) => {
+      log.info(`${key}: ${value}`)
+    })
+    log.info(
+      `calculateHourlyAgreement: ledger_hashes under consideration: ${Array.from(
+        ledgers,
+      ).join(',')}`,
+    )
+
     const missed = setDifference(ledgers, validations)
     const validated = setIntersection(ledgers, validations)
 
