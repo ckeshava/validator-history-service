@@ -25,6 +25,7 @@ import logger from '../shared/utils/logger'
 import chains from './chains'
 
 const log = logger({ name: 'agreement' })
+const debug_log = logger({ name: 'debug-agreement' })
 
 const AGREEMENT_INTERVAL = 60 * 60 * 1000
 const PURGE_INTERVAL = 10 * 60 * 1000
@@ -298,21 +299,33 @@ class Agreement {
     ledgers: Set<string>,
     incomplete: boolean,
   ): Promise<void> {
-    log.info(
-      `calculateHourlyAgreement: initiating agreement computation at timestamp: ${new Date().toISOString()}`,
-    )
-    log.info(
-      `calculateHourlyAgreement: validator_keys: ${validator_keys.signing_key}`,
-    )
-    log.info(`calculateHourlyAgreement: validation counts: `)
-    validations.forEach((value, key) => {
-      log.info(`${key}: ${value}`)
-    })
-    log.info(
-      `calculateHourlyAgreement: ledger_hashes under consideration: ${Array.from(
-        ledgers,
-      ).join(',')}`,
-    )
+    // print the logs only for a specific validator
+    if (
+      validator_keys.signing_key ===
+        'n9LbM9S5jeGopF5J1vBDoGxzV6rNS8K1T5DzhNynkFLqR9N2fywX' ||
+      validator_keys.master_key ===
+        'nHU4bLE3EmSqNwfL4AP1UZeTNPrSPPP6FXLKXo2uqfHuvBQxDVKd'
+    ) {
+      debug_log.info(
+        `calculateHourlyAgreement: initiating agreement computation at timestamp: ${new Date().toISOString()}`,
+      )
+      debug_log.info(
+        `calculateHourlyAgreement: validator_keys: ${JSON.stringify(
+          validator_keys,
+          null,
+          2,
+        )}`,
+      )
+      debug_log.info(`calculateHourlyAgreement: validation counts: `)
+      validations.forEach((value, key) => {
+        debug_log.info(`${key}: ${value}`)
+      })
+      debug_log.info(
+        `calculateHourlyAgreement: ledger_hashes under consideration: ${Array.from(
+          ledgers,
+        ).join(',')}`,
+      )
+    }
 
     const missed = setDifference(ledgers, validations)
     const validated = setIntersection(ledgers, validations)

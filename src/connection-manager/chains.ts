@@ -6,6 +6,7 @@ import { getLists, overlaps } from '../shared/utils'
 import logger from '../shared/utils/logger'
 
 const log = logger({ name: 'chains' })
+const debug_log = logger({ name: 'debug-validations' })
 /**
  * Helper to sort chains by chain length.
  *
@@ -31,8 +32,8 @@ function addLedgerToChain(ledger: Ledger, chain: Chain): void {
 
   chain.current = ledger.ledger_index
   chain.updated = ledger.first_seen
-  log.info(
-    `addLedgerToChain: (Ledger Index: ${ledger.ledger_index}, Ledger Hash: ${ledger.ledger_hash}) added to chain ${chain.id}`,
+  debug_log.info(
+    `addLedgerToChain: (Ledger Index: ${ledger.ledger_index}, Ledger Hash: ${ledger.ledger_hash}) added to chain ${chain.id} at time ${ledger.first_seen}`,
   )
 }
 
@@ -117,13 +118,13 @@ class Chains {
       }
 
       if (ledger.validations.size <= 1) {
-        log.warn(
-          `chains: Ledger ${ledger.ledger_index}, ledger_hash: ${ledger_hash} has only one validation; This is ignored for purposes of agreement calculation`,
+        debug_log.warn(
+          `chains: Ledger ${ledger.ledger_index}, ledger_hash: ${ledger_hash} has ${ledger.validations.size} validation; This is ignored for purposes of agreement calculation`,
         )
       }
 
       if (tenSecondsOld) {
-        log.info(
+        debug_log.info(
           `chains: Ledger ${ledger.ledger_index}, ledger_hash: ${ledger_hash} is >= 10 seconds old; Removing this from in-memory this.ledgersByHash cache.`,
         )
         this.ledgersByHash.delete(ledger_hash)
@@ -150,7 +151,7 @@ class Chains {
     })
 
     for (const chain of this.chains) {
-      log.info(`purgeChains: purging all data from chain: ${chain.id}`)
+      debug_log.info(`purgeChains: purging all data from chain: ${chain.id}`)
       chain.ledgers.clear()
       chain.incomplete = false
       promises.push(saveValidatorChains(chain))
@@ -195,7 +196,7 @@ class Chains {
     }
 
     log.info(`Added new chain, chain.${chain.id}`)
-    log.info(
+    debug_log.info(
       `Initializing new chain with the ledger: ${JSON.stringify(
         ledger,
         null,
@@ -215,7 +216,7 @@ class Chains {
     const next = ledger.ledger_index
     const validators = ledger.validations
 
-    log.info(
+    debug_log.info(
       `updateChains invoked for ledger: ${ledger.ledger_index} (Ledger Hash: ${ledger.ledger_hash})`,
     )
 
@@ -241,7 +242,7 @@ class Chains {
       .shift()
 
     if (chainAtThisIndex !== undefined) {
-      log.info(
+      debug_log.info(
         `updateChains: ${ledger.ledger_index} is already processed inside chain ${chainAtThisIndex.id}`,
       )
       return
@@ -252,7 +253,7 @@ class Chains {
       .shift()
 
     if (chainWithThisValidator !== undefined) {
-      log.info(
+      debug_log.info(
         `updateChains: Found an existing chain ${chainWithThisValidator.id} with an overlapping validator set`,
       )
     }
@@ -262,7 +263,7 @@ class Chains {
     )
 
     if (chainWithLedger !== undefined) {
-      log.info(
+      debug_log.info(
         `updateChains: Found an existing chain ${chainWithLedger.id} with the ledger index ${ledger.ledger_index} and ledger hash ${ledger.ledger_hash}`,
       )
     }
@@ -274,14 +275,14 @@ class Chains {
         chainWithThisValidator.incomplete = true
         addLedgerToChain(ledger, chainWithThisValidator)
       } else {
-        log.warn(
+        debug_log.warn(
           `updateChains: ${ledger.ledger_index} is not added to any chain.`,
         )
       }
     }
 
     if (chainWithThisValidator !== undefined || chainWithLedger !== undefined) {
-      log.warn(
+      debug_log.warn(
         `updateChains: ${ledger.ledger_index} is not added to any chain.`,
       )
       return
