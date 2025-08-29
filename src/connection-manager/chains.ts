@@ -229,6 +229,9 @@ class Chains {
       .shift()
 
     if (chainAtNextIndex !== undefined) {
+      debug_log.info(
+        `updateChains: LedgerIndex: ${ledger.ledger_index}, LedgerHash: ${ledger.ledger_hash} will be stored into chain: ${chainAtNextIndex.id}`,
+      )
       addLedgerToChain(ledger, chainAtNextIndex)
       return
     }
@@ -243,7 +246,7 @@ class Chains {
 
     if (chainAtThisIndex !== undefined) {
       debug_log.info(
-        `updateChains: ${ledger.ledger_index} is already processed inside chain ${chainAtThisIndex.id}`,
+        `updateChains: LedgerIndex: ${ledger.ledger_index}, LedgerHash: ${ledger.ledger_hash} is already processed inside chain ${chainAtThisIndex.id}. Ignoring this input data.`,
       )
       return
     }
